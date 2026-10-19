@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Maven
 target/
 *.class
@@ -14,3 +15,8 @@ target/
 # Sistema
 Thumbs.db
 .DS_Store
+=======
+target/ 
+.idea/ 
+*.iml 
+>>>>>>> 966904330b42a0d4aac9b260274f1c6704126293
