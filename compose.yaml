@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: gestion
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    volumes:
+      - datos:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy  # <--- Esto obliga a esperar a que la BD esté lista
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://db:3306/gestion?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8090:8080"
+    networks:
+      - app-network
+
+  proxy:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    depends_on: [api]
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+    networks:
+      - app-network
+
+volumes:
+  datos:
+
+networks:
+  app-network:
+    driver: bridge

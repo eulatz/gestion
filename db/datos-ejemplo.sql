@@ -1,78 +1,102 @@
-USE `gestion`;
 
--- ---------------------------------------------------------
--- 1. TABLAS INDEPENDIENTES
--- ---------------------------------------------------------
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `casas_vasallas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `casas_vasallas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `castillo` varchar(255) DEFAULT NULL,
+  `lealtad` int NOT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `grandes_casas_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKn3wwd9jximhkkthxwx64yg9tx` (`grandes_casas_id`),
+  CONSTRAINT `FKn3wwd9jximhkkthxwx64yg9tx` FOREIGN KEY (`grandes_casas_id`) REFERENCES `grandes_casas` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `fortalezas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `fortalezas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `capacidad` int DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `ubicacion` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `grandes_casas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `grandes_casas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `lema` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `region` enum('ESTE','NORTE','OESTE','SUR') DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `maestres`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `maestres` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ano_graduacion` int DEFAULT NULL,
+  `especialidad` enum('CUERVOS','HISTORIA','MEDICINA','RUMORES') DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `tipo_eslabon` enum('COBRE','HIERRO','ORO','PLATA') DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `recuadaciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `recuadaciones` (
+  `fecha` date NOT NULL,
+  `estado_pago` enum('EN_DEMORA','EXIMIDO_POR_GUERRA','SATISFECHO') DEFAULT NULL,
+  `importe` int DEFAULT NULL,
+  `grandes_casas_id` int NOT NULL,
+  `maestres_id` int NOT NULL,
+  PRIMARY KEY (`fecha`,`grandes_casas_id`,`maestres_id`),
+  KEY `FKk240p1q29arfyllvxcbsfodi2` (`grandes_casas_id`),
+  KEY `FK381w2nuy2qyig9jby6to1ul57` (`maestres_id`),
+  CONSTRAINT `FK381w2nuy2qyig9jby6to1ul57` FOREIGN KEY (`maestres_id`) REFERENCES `maestres` (`id`),
+  CONSTRAINT `FKk240p1q29arfyllvxcbsfodi2` FOREIGN KEY (`grandes_casas_id`) REFERENCES `grandes_casas` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `regimientos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `regimientos` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `coste_mantenimiento` double DEFAULT NULL,
+  `num_soldados` int DEFAULT NULL,
+  `tipo_tropa` enum('ARQUERIA','ASEDIO','CABALLERIA','INFANTERIA','PESADA') DEFAULT NULL,
+  `casas_vasallas_id` int DEFAULT NULL,
+  `fortalezas_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK6vdfj0tl7a3h1y65u3s3oh4y0` (`casas_vasallas_id`),
+  KEY `FKm7hqsmj02i9qx1vx5ued1q4rs` (`fortalezas_id`),
+  CONSTRAINT `FK6vdfj0tl7a3h1y65u3s3oh4y0` FOREIGN KEY (`casas_vasallas_id`) REFERENCES `casas_vasallas` (`id`),
+  CONSTRAINT `FKm7hqsmj02i9qx1vx5ued1q4rs` FOREIGN KEY (`fortalezas_id`) REFERENCES `fortalezas` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
--- Insertar Grandes Casas
--- Enums permitidos: 'ESTE', 'NORTE', 'OESTE', 'SUR'
-INSERT INTO `grandes_casas` (`id`, `nombre`, `lema`, `region`) VALUES
-(1, 'Casa Stark', 'Se acerca el invierno', 'NORTE'),
-(2, 'Casa Lannister', 'Oye mi rugido', 'OESTE'),
-(3, 'Casa Arryn', 'Tan alto como el honor', 'ESTE'),
-(4, 'Casa Martell', 'Nunca doblegado, nunca roto', 'SUR'),
-(5, 'Casa Baratheon', 'Nuestra es la furia', 'SUR');
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Insertar Fortalezas
-INSERT INTO `fortalezas` (`id`, `nombre`, `ubicacion`, `capacidad`) VALUES
-(1, 'Invernalia', 'El Norte', 10000),
-(2, 'Roca Casterly', 'Tierras del Oeste', 12000),
-(3, 'Nido de Águilas', 'Valle de Arryn', 3000),
-(4, 'Lanza del Sol', 'Dorne', 5000),
-(5, 'Bastión de Tormentas', 'Tierras de la Tormenta', 8000),
-(6, 'Fuerte Terror', 'El Norte', 4000);
-
--- Insertar Maestres
--- Especialidad: 'CUERVOS', 'HISTORIA', 'MEDICINA', 'RUMORES'
--- Tipo Eslabón: 'COBRE', 'HIERRO', 'ORO', 'PLATA'
-INSERT INTO `maestres` (`id`, `nombre`, `especialidad`, `tipo_eslabon`, `ano_graduacion`) VALUES
-(1, 'Maestre Luwin', 'MEDICINA', 'PLATA', 280),
-(2, 'Maestre Aemon', 'CUERVOS', 'HIERRO', 235),
-(3, 'Maestre Pycelle', 'HISTORIA', 'ORO', 250),
-(4, 'Maestre Wolkan', 'MEDICINA', 'PLATA', 292),
-(5, 'Maestre Qyburn', 'RUMORES', 'COBRE', 285);
-
--- ---------------------------------------------------------
--- 2. TABLAS DEPENDIENTES DE NIVEL 1
--- ---------------------------------------------------------
-
--- Insertar Casas Vasallas
--- FK: grandes_casas_id -> grandes_casas(id)
-INSERT INTO `casas_vasallas` (`id`, `nombre`, `castillo`, `lealtad`, `grandes_casas_id`) VALUES
-(1, 'Casa Karstark', 'Bastión Kar', 85, 1),
-(2, 'Casa Umber', 'Último Hogar', 90, 1),
-(3, 'Casa Bolton', 'Fuerte Terror', 30, 1),
-(4, 'Casa Clegane', 'Torreón Clegane', 95, 2),
-(5, 'Casa Lefford', 'Diente Dorado', 80, 2),
-(6, 'Casa Royce', 'Piedra Rúnica', 88, 3),
-(7, 'Casa Dayne', 'Campoestrella', 92, 4),
-(8, 'Casa Tarth', 'Castillo de Tarth', 100, 5);
-
--- Insertar Recaudaciones
--- FKs: grandes_casas_id -> grandes_casas(id), maestres_id -> maestres(id)
--- Estado Pago: 'EN_DEMORA', 'EXIMIDO_POR_GUERRA', 'SATISFECHO'
-INSERT INTO `recuadaciones` (`fecha`, `grandes_casas_id`, `maestres_id`, `importe`, `estado_pago`) VALUES
-('2026-01-15', 1, 1, 15000, 'SATISFECHO'),
-('2026-02-10', 2, 3, 55000, 'SATISFECHO'),
-('2026-02-15', 3, 4, 8000, 'EN_DEMORA'),
-('2026-03-01', 4, 5, 12000, 'EXIMIDO_POR_GUERRA'),
-('2026-03-20', 5, 2, 20000, 'SATISFECHO'),
-('2026-04-10', 1, 4, 14500, 'SATISFECHO'),
-('2026-05-05', 2, 3, 60000, 'SATISFECHO');
-
--- ---------------------------------------------------------
--- 3. TABLAS DEPENDIENTES DE NIVEL 2
--- ---------------------------------------------------------
-
--- Insertar Regimientos
--- FKs: casas_vasallas_id -> casas_vasallas(id), fortalezas_id -> fortalezas(id)
--- Tipo Tropa: 'ARQUERIA', 'ASEDIO', 'CABALLERIA', 'INFANTERIA', 'PESADA'
-INSERT INTO `regimientos` (`id`, `tipo_tropa`, `num_soldados`, `coste_mantenimiento`, `casas_vasallas_id`, `fortalezas_id`) VALUES
-(1, 'INFANTERIA', 1500, 4500.50, 1, 1),
-(2, 'ARQUERIA', 800, 2400.00, 2, 1),
-(3, 'PESADA', 2000, 8500.75, 3, 6),
-(4, 'CABALLERIA', 1200, 6000.00, 4, 2),
-(5, 'INFANTERIA', 3000, 9000.00, 5, 2),
-(6, 'CABALLERIA', 1500, 7200.25, 6, 3),
-(7, 'ARQUERIA', 600, 1800.00, 7, 4),
-(8, 'ASEDIO', 400, 5100.80, 8, 5);
